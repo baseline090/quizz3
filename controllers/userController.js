@@ -199,7 +199,7 @@ exports.forgotPassword = async (req, res) => {
 
     // Send OTP via email
     const mailOptions = {
-      from: 'aakash.verma.nature@gmail.com',
+      from: 'saurabhs26667@gmail.com',
       to: email,
       subject: 'Password Reset OTP',
       text: `Your OTP for password reset is: ${otp}. It is valid for 5 minutes.`,
@@ -213,16 +213,6 @@ exports.forgotPassword = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
-
-
-
-
-
-
-
 
 
 // // Verify OTP
@@ -283,11 +273,6 @@ exports.verifyOtp = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
-
-
 
 
 
@@ -365,20 +350,6 @@ exports.resetPassword = async (req, res) => {
     res.status(400).json({ message: 'Invalid reset token.' });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
