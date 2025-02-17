@@ -52,17 +52,17 @@
 
 
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const resultSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   quizId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Quiz',
+    ref: "Quiz",
     required: true,
   },
   correctAnswer: {
@@ -89,7 +89,7 @@ const resultSchema = new mongoose.Schema({
   },
   passFail: {
     type: String,
-    enum: ['pass', 'fail'],
+    enum: ["pass", "fail"],
     required: true,
   },
   questionDetails: [
@@ -99,7 +99,7 @@ const resultSchema = new mongoose.Schema({
         required: true,
       },
       options: {
-        type: [String],
+        type: [String], // Ensuring it's an array of strings
         required: true,
       },
       correctAnswer: {
@@ -117,6 +117,7 @@ const resultSchema = new mongoose.Schema({
       scorePoint: {
         type: Number,
         default: 0,
+        required: true, // Ensuring consistency
       },
     },
   ],
@@ -126,4 +127,4 @@ const resultSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Result', resultSchema);
+module.exports = mongoose.model("Result", resultSchema);

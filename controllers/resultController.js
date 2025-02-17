@@ -6,10 +6,10 @@ exports.submitQuiz = async (req, res) => {
   try {
     const { quizId, answers } = req.body;
 
-    console.log("quizId: ", quizId);
-    console.log("req.body: ", req.body);
+    console.log("quizId:", quizId);
+    console.log("req.body:", req.body);
 
-    const quiz = await Quiz.findById(quizId);
+    const quiz = await Quiz.findById(quizId).populate("questions"); // Ensure questions are populated
     console.log("Fetched Quiz:", quiz);
 
     if (!quiz) {
@@ -21,8 +21,8 @@ exports.submitQuiz = async (req, res) => {
 
     // Create an array to store detailed question results
     const questionDetails = quiz.questions.map((question, index) => {
-      const userAnswer = answers[index];
-      const isCorrect = userAnswer === question.correctAnswer;
+      const userAnswer = answers[index] ?? "none"; // Ensure a valid answer
+      const isCorrect = userAnswer.toString() === question.correctAnswer.toString(); // Ensure type consistency
 
       if (userAnswer === "none") {
         incorrectAnswers++;
@@ -33,33 +33,31 @@ exports.submitQuiz = async (req, res) => {
       }
 
       return {
-        questionText: question.text, 
-        options: question.options, 
+        questionText: question.text,
+        options: question.options,
         correctAnswer: question.correctAnswer,
         userAnswer,
         isCorrect,
-        scorePoint: isCorrect ? 1 : 0, 
+        scorePoint: isCorrect ? 1 : 0,
       };
     });
 
     const totalPercentage = (correctAnswers / quiz.questions.length) * 100;
     const passFail = totalPercentage >= quiz.passingCriteria ? "pass" : "fail";
 
-    
-    const result = {
+    const result = new Result({
       userId: req.user.userId,
       quizId: quiz._id,
       totalScore: correctAnswers,
       totalQuestions: quiz.questions.length,
       totalPercentage,
       passFail,
-      correctAnswer: correctAnswers, 
+      correctAnswer: correctAnswers,
       incorrectAnswer: incorrectAnswers,
-      questionDetails, 
-    };
+      questionDetails,
+    });
 
-  
-    const savedResult = await Result.create(result);
+    const savedResult = await result.save();
 
     return res.status(200).json({
       message: "Quiz submitted successfully",
@@ -67,11 +65,15 @@ exports.submitQuiz = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in submitQuiz:", error);
-    return res
-      .status(500)
-      .json({ error: "An error occurred while submitting the quiz" });
+    return res.status(500).json({ error: "An error occurred while submitting the quiz" });
   }
 };
+
+
+
+
+
+
 
 
 
