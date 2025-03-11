@@ -4,10 +4,11 @@ const Result = require("../models/Result");
 
 exports.submitQuiz = async (req, res) => {
   try {
-    const { quizId, answers } = req.body;
+    const { quizId, answers, signature } = req.body;
 
-    console.log("quizId:", quizId);
-    console.log("req.body:", req.body);
+    if (!signature) {
+      return res.status(400).json({ error: "Signature is required" });
+    }
 
     const quiz = await Quiz.findById(quizId).populate("questions"); // Ensure questions are populated
     console.log("Fetched Quiz:", quiz);
@@ -55,6 +56,7 @@ exports.submitQuiz = async (req, res) => {
       correctAnswer: correctAnswers,
       incorrectAnswer: incorrectAnswers,
       questionDetails,
+      signature,
     });
 
     const savedResult = await result.save();

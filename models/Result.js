@@ -119,6 +119,10 @@ const resultSchema = new mongoose.Schema({
         default: 0,
         required: true, 
       },
+      signature:{
+        type:String,
+        required:true
+      }
     },
   ],
   createdAt: {

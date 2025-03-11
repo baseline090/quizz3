@@ -7,6 +7,7 @@ const Category= require('../models/Category');
 exports.addQuiz = async (req, res) => {
   const { name, title, description, questions, passingCriteria, scorePerQuestion, totalPercentage, category, signature } = req.body;
   console.log("Incoming request body:", req.body);
+  console.log("Incoming request body:", JSON.stringify(req.body, null, 2));
 
   if (!name || !title || !description || !questions || !passingCriteria || !scorePerQuestion || !totalPercentage || !category || !signature) {
     return res.status(400).json({ error: "All fields are required" });
