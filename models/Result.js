@@ -99,7 +99,7 @@ const resultSchema = new mongoose.Schema({
         required: true,
       },
       options: {
-        type: [String], // Ensuring it's an array of strings
+        type: [String], 
         required: true,
       },
       correctAnswer: {
@@ -117,7 +117,7 @@ const resultSchema = new mongoose.Schema({
       scorePoint: {
         type: Number,
         default: 0,
-        required: true, // Ensuring consistency
+        required: true, 
       },
     },
   ],

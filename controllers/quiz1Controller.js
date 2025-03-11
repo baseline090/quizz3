@@ -4,46 +4,44 @@ const Quiz = require('../models/Quiz');
 const Category= require('../models/Category');
 
 //---------- Add a new quiz
-  exports.addQuiz = async (req, res) => {
-    const { name, title, description, questions, passingCriteria, scorePerQuestion, totalPercentage, category } = req.body;
-    console.log("Incoming request body:", req.body);
-  
-    //------ Field validation
-    if (!name || !title || !description || !questions || !passingCriteria || !scorePerQuestion || !totalPercentage || !category) {
-      return res.status(400).json({ error: "All fields are required" });
+exports.addQuiz = async (req, res) => {
+  const { name, title, description, questions, passingCriteria, scorePerQuestion, totalPercentage, category, signature } = req.body;
+  console.log("Incoming request body:", req.body);
+
+  if (!name || !title || !description || !questions || !passingCriteria || !scorePerQuestion || !totalPercentage || !category || !signature) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const totalTime = questions.length * 2;
+    const adjustedScorePerQuestion = Math.max(scorePerQuestion, 1);
+
+    const foundCategory = await Category.findOne({ name: category });
+    if (!foundCategory) {
+      return res.status(400).json({ error: "Category not found" });
     }
-  
-    try {
-      const totalTime = questions.length * 2;  
-      const adjustedScorePerQuestion = Math.max(scorePerQuestion, 1);  
-  
-  
-      const foundCategory = await Category.findOne({ name: category });
-  
-      if (!foundCategory) {
-        return res.status(400).json({ error: "Category not found" });
-      }
-  
-      const quiz = new Quiz({
-        name,
-        title,
-        description,
-        questions,
-        totalTime,
-        passingCriteria,
-        scorePerQuestion: adjustedScorePerQuestion,
-        totalPercentage,
-        isAvailable: true,
-        category: foundCategory._id 
-      });
-  
-      const savedQuiz = await quiz.save();
-      res.status(201).json(savedQuiz);
-    } catch (error) {
-      console.error("Error while saving quiz:", error);
-      res.status(500).json({ error: "An error occurred while saving the quiz", details: error.message });
-    }
-  };
+
+    const quiz = new Quiz({
+      name,
+      title,
+      description,
+      questions,
+      totalTime,
+      passingCriteria,
+      scorePerQuestion: adjustedScorePerQuestion,
+      totalPercentage,
+      isAvailable: true,
+      category: foundCategory._id,
+      signature,  // Save the signature
+    });
+
+    const savedQuiz = await quiz.save();
+    res.status(201).json(savedQuiz);
+  } catch (error) {
+    console.error("Error while saving quiz:", error);
+    res.status(500).json({ error: "An error occurred while saving the quiz", details: error.message });
+  }
+};
   
 // Get all quizzes
 exports.getAllQuiz = async (req, res) => {

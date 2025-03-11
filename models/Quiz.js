@@ -17,7 +17,7 @@ const quizSchema = new mongoose.Schema({
   totalPercentage: { type: Number, required: true },
   isAvailable: { type: Boolean, default: false },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
-
+  signature:{type: String,required: true }
 });
 
 module.exports = mongoose.model('Quiz', quizSchema);
