@@ -2,16 +2,18 @@ const mongoose = require("mongoose");
 const Quiz = require("../models/Quiz");
 const Result = require("../models/Result");
 
+const saveBase64Image = (base64String) => {
+  const base64Data = base64String.replace(/^data:image\/png;base64,/, "");
+
+  return base64Data;
+};
 exports.submitQuiz = async (req, res) => {
   try {
     const { quizId, answers, signature } = req.body;
+    console.log("answers: ", answers);
+    console.log("signature: ", signature);
 
-    if (!signature) {
-      return res.status(400).json({ error: "Signature is required" });
-    }
-
-    const quiz = await Quiz.findById(quizId).populate("questions"); // Ensure questions are populated
-    console.log("Fetched Quiz:", quiz);
+    const quiz = await Quiz.findById(quizId).populate("questions");
 
     if (!quiz) {
       return res.status(404).json({ error: "Quiz not found" });
@@ -20,10 +22,10 @@ exports.submitQuiz = async (req, res) => {
     let correctAnswers = 0;
     let incorrectAnswers = 0;
 
-    // Create an array to store detailed question results
     const questionDetails = quiz.questions.map((question, index) => {
-      const userAnswer = answers[index] ?? "none"; // Ensure a valid answer
-      const isCorrect = userAnswer.toString() === question.correctAnswer.toString(); // Ensure type consistency
+      const userAnswer = answers[index] ?? "none";
+      const isCorrect =
+        userAnswer.toString() === question.correctAnswer.toString();
 
       if (userAnswer === "none") {
         incorrectAnswers++;
@@ -46,6 +48,11 @@ exports.submitQuiz = async (req, res) => {
     const totalPercentage = (correctAnswers / quiz.questions.length) * 100;
     const passFail = totalPercentage >= quiz.passingCriteria ? "pass" : "fail";
 
+    const signaturePath = saveBase64Image(
+      signature,
+      `quiz_${quizId}_signature`
+    );
+
     const result = new Result({
       userId: req.user.userId,
       quizId: quiz._id,
@@ -56,7 +63,7 @@ exports.submitQuiz = async (req, res) => {
       correctAnswer: correctAnswers,
       incorrectAnswer: incorrectAnswers,
       questionDetails,
-      signature,
+      signature: signaturePath,
     });
 
     const savedResult = await result.save();
@@ -67,17 +74,11 @@ exports.submitQuiz = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in submitQuiz:", error);
-    return res.status(500).json({ error: "An error occurred while submitting the quiz" });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while submitting the quiz" });
   }
 };
-
-
-
-
-
-
-
-
 
 exports.getAllsubmitQuiz = async (req, res) => {
   try {

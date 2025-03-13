@@ -353,7 +353,6 @@ exports.resetPassword = async (req, res) => {
 
 
 
-// Profile Update Controller
 exports.updateProfile = async (req, res) => {
   console.log("Received Profile Update Request");
 
@@ -363,14 +362,12 @@ exports.updateProfile = async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    // Check for file size error
     if (req.fileValidationError) {
       return res.status(400).json({ message: req.fileValidationError });
     }
 
     console.log("Received Data:", req.body);
 
-    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -378,7 +375,6 @@ exports.updateProfile = async (req, res) => {
 
     console.log("User found in database:", user);
 
-    // Update profile details
     if (firstName) user.firstName = firstName;
     if (username) user.username = username;
     if (email) user.email = email;
@@ -386,7 +382,6 @@ exports.updateProfile = async (req, res) => {
     if (profilePic) user.profilePic = profilePic;
  
 
-    // Update profile picture if provided
     if (req.file) {
       console.log("Profile picture uploaded:", req.file.originalname);
       user.profilePic = req.file.buffer.toString("base64");
@@ -394,11 +389,9 @@ exports.updateProfile = async (req, res) => {
       console.log("No profile picture uploaded.");
     }
 
-    // Save the updated user
     await user.save();
     console.log("User profile updated successfully in database.");
 
-    // Send response with updated user details
     res.json({
       message: "Profile updated successfully",
       user: {
@@ -407,7 +400,7 @@ exports.updateProfile = async (req, res) => {
         username: user.username,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        profilePic: user.profilePic, // Base64 string format
+        profilePic: user.profilePic, 
       },
     });
   } catch (err) {
@@ -421,7 +414,6 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Controller to fetch user profile
 exports.getUserProfile = async (req, res) => {
   const userId = req.user.userId;
   console.log('userId12: ', userId);
@@ -451,7 +443,6 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-// Get all categories
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();

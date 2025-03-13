@@ -3,24 +3,6 @@
 const Quiz = require('../models/Quiz');
 const Category= require('../models/Category');
 
-const saveBase64Image = (base64String, quizId) => {
-  const matches = base64String.match(/^data:(.+);base64,(.+)$/);
-  if (!matches || matches.length !== 3) {
-    throw new Error('Invalid base64 string');
-  }
-
-  const ext = matches[1].split('/')[1];
-  const buffer = Buffer.from(matches[2], 'base64');
-  const filePath = path.join(__dirname, `../uploads/signatures/${quizId}.${ext}`);
-
-  // Ensure the directory exists
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-
-  fs.writeFileSync(filePath, buffer);
-  return `/uploads/signatures/${quizId}.${ext}`;
-};
-
-
 //---------- Add a new quiz
 exports.addQuiz = async (req, res) => {
   const { name, title, description, questions, passingCriteria, scorePerQuestion, totalPercentage, category, signature } = req.body;
@@ -28,7 +10,7 @@ exports.addQuiz = async (req, res) => {
   console.log("Incoming request body:", req.body);
   console.log("Incoming request body:", JSON.stringify(req.body, null, 2));
 
-  if (!name || !title || !description || !questions || !passingCriteria || !scorePerQuestion || !totalPercentage || !category || !signature) {
+  if (!name || !title || !description || !questions || !passingCriteria || !scorePerQuestion || !totalPercentage || !category ) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
@@ -41,7 +23,6 @@ exports.addQuiz = async (req, res) => {
       return res.status(400).json({ error: "Category not found" });
     }
 
-    const savedSignaturePath = saveBase64Image(signature, name.replace(/\s+/g, '_'));
     const quiz = new Quiz({
       name,
       title,
@@ -53,7 +34,7 @@ exports.addQuiz = async (req, res) => {
       totalPercentage,
       isAvailable: true,
       category: foundCategory._id,
-      signature: savedSignaturePath, 
+      signature: signature,   
     });
 
     const savedQuiz = await quiz.save();
@@ -64,7 +45,6 @@ exports.addQuiz = async (req, res) => {
   }
 };
   
-// Get all quizzes
 exports.getAllQuiz = async (req, res) => {
   try {
     const quizzes = await Quiz.find();
@@ -80,7 +60,6 @@ exports.getAllQuiz = async (req, res) => {
   }
 };
 
-// Delete a quiz by ID
 exports.deleteQuiz = async (req, res) => {
   const { id } = req.params;
 

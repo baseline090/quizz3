@@ -92,6 +92,10 @@ const resultSchema = new mongoose.Schema({
     enum: ["pass", "fail"],
     required: true,
   },
+  signature:{
+    type:String,
+    required:true
+  },
   questionDetails: [
     {
       questionText: {
@@ -108,7 +112,7 @@ const resultSchema = new mongoose.Schema({
       },
       userAnswer: {
         type: String,
-        required: true,
+        required: false,
       },
       isCorrect: {
         type: Boolean,
@@ -121,8 +125,8 @@ const resultSchema = new mongoose.Schema({
       },
       signature:{
         type:String,
-        required:true
-      }
+        required:false
+      },
     },
   ],
   createdAt: {
